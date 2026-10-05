@@ -2,161 +2,184 @@ package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.R
-import com.example.myapplication.model.ModoTema
-import com.example.myapplication.ui.components.BotonModoTema
-import com.example.myapplication.ui.components.BotonPrimario
-import com.example.myapplication.ui.components.BotonSecundario
-import com.example.myapplication.ui.components.OrderBotCard
-import com.example.myapplication.ui.theme.OrderBotTheme
+import com.example.myapplication.AzulOrderBot
+import com.example.myapplication.FondoOrderBot
+import com.example.myapplication.TextoPrincipal
+import com.example.myapplication.TextoSecundario
+import com.example.myapplication.VerdeOrderBot
 
-/**
- * Pantalla 5: confirmación del pedido realizado.
- *
- * @param numeroPedido número generado al confirmar; llega como
- *        argumento type-safe de la ruta de navegación.
- * @param onVolverInicio reinicia el flujo volviendo a la pantalla inicial.
- * @param modoTema modo de tema activo (para el botón de cambio).
- * @param onCambiarTema alterna claro → oscuro → automático.
- */
 @Composable
 fun PantallaConfirmacion(
-    numeroPedido: Int,
-    onVolverInicio: () -> Unit,
-    modoTema: ModoTema,
-    onCambiarTema: () -> Unit
+    estadoOnline: String,
+    volverInicio: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .safeDrawingPadding()
+            .background(FondoOrderBot)
             .padding(24.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally,
+
         verticalArrangement = Arrangement.Center
     ) {
-        // Selector de tema en la esquina superior derecha.
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
-        }
-
-        // Ícono de éxito: se usa el color "tertiary" del tema
-        // (verde de marca) en lugar de un valor fijo.
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                    shape = RoundedCornerShape(50.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "✓",
-                fontSize = 58.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.tertiary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = stringResource(R.string.confirmacion_titulo),
+            text = "✓",
+            fontSize = 64.sp,
+            fontWeight = FontWeight.Bold,
+            color = VerdeOrderBot
+        )
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
+
+        Text(
+            text = "¡Pedido confirmado!",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = TextoPrincipal,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
 
         Text(
-            text = stringResource(R.string.confirmacion_mensaje),
+            text = "Tu pedido ha sido registrado correctamente.",
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = TextoSecundario,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
 
-        // Información del pedido
-        OrderBotCard {
-            Text(
-                text = stringResource(R.string.confirmacion_numero_pedido, numeroPedido),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors()
+        ) {
+
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+
+                Text(
+                    text = "Pedido #1024",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextoPrincipal
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+                    text = "Entrega estimada: 30 - 40 minutos",
+                    color = TextoSecundario
+                )
+
+                Spacer(
+                    modifier = Modifier.height(6.dp)
+                )
+
+                Text(
+                    text = "Método de pago: Contra entrega",
+                    color = TextoSecundario
+                )
+
+                Spacer(
+                    modifier = Modifier.height(6.dp)
+                )
+
+                Text(
+                    text = "Estado: Confirmado",
+                    color = TextoSecundario
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+                    text = "🌐 Servicio: $estadoOnline",
+                    fontWeight = FontWeight.Bold,
+                    color = if (estadoOnline == "Sin conexión") {
+                        TextoSecundario
+                    } else {
+                        VerdeOrderBot
+                    }
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
+
+        Button(
+            onClick = {
+                // Función pendiente para seguimiento en vivo.
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AzulOrderBot
             )
-            Spacer(modifier = Modifier.height(10.dp))
+        ) {
+
             Text(
-                text = stringResource(R.string.confirmacion_entrega_estimada),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = stringResource(R.string.confirmacion_metodo_pago),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = stringResource(R.string.confirmacion_estado),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "Seguir pedido en vivo"
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
 
-        BotonPrimario(
-            texto = stringResource(R.string.confirmacion_boton_seguir),
+        Button(
             onClick = {
-                // Pendiente: conectar con el seguimiento en vivo.
-            }
-        )
+                volverInicio()
+            },
 
-        Spacer(modifier = Modifier.height(10.dp))
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
 
-        BotonSecundario(
-            texto = stringResource(R.string.confirmacion_boton_volver),
-            onClick = onVolverInicio
-        )
-    }
-}
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AzulOrderBot
+            )
+        ) {
 
-@Preview(showBackground = true)
-@Composable
-private fun PantallaConfirmacionPreview() {
-    OrderBotTheme {
-        PantallaConfirmacion(
-            numeroPedido = 1024,
-            onVolverInicio = {},
-            modoTema = ModoTema.SISTEMA,
-            onCambiarTema = {}
-        )
+            Text(
+                text = "Volver al inicio"
+            )
+        }
     }
 }
