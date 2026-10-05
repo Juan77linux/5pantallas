@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Fondo del ícono de la app: el azul claro de marca (AzulClaroOrderBot). -->
+    <color name="ic_launcher_background">#EFF6FF</color>
 </resources>

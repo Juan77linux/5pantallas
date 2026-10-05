@@ -1,5 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Todos los textos visibles de la app viven aquí.
+    Ventajas: facilita traducciones, evita duplicados y permite
+    revisar el copy completo sin tocar el código.
+-->
 <resources>
 
     <string name="app_name">OrderBot</string>
+
+    <!-- General -->
+    <string name="logo_descripcion">Logo de OrderBot</string>
+
+    <!-- Pantalla de inicio -->
+    <string name="inicio_eslogan">¡Pide fácil, recibe rápido!</string>
+    <string name="inicio_beneficio_rapido_titulo">Atención instantánea</string>
+    <string name="inicio_beneficio_rapido_desc">Disponible las 24 horas.</string>
+    <string name="inicio_beneficio_sugerencias_titulo">Sugerencias personalizadas</string>
+    <string name="inicio_beneficio_sugerencias_desc">Encuentra opciones según tu pedido.</string>
+    <string name="inicio_boton_comenzar">Comenzar</string>
+
+    <!-- Pantalla de conversación -->
+    <string name="conversacion_titulo">OrderBot 💬</string>
+    <string name="conversacion_subtitulo">Asistente de pedidos</string>
+    <string name="conversacion_saludo">Hola 👋</string>
+    <string name="conversacion_pregunta">¿Qué deseas pedir hoy?</string>
+
+    <!-- Productos del catálogo -->
+    <string name="producto_hamburguesa">Hamburguesa</string>
+    <string name="producto_hamburguesa_desc">Hamburguesa clásica</string>
+    <string name="producto_pizza">Pizza</string>
+    <string name="producto_pizza_desc">Opción disponible próximamente</string>
+    <string name="producto_papas">Papas</string>
+    <string name="producto_bebida">Bebida</string>
+    <string name="producto_boton_elegir">Elegir</string>
+
+    <!-- Pantalla de recomendación -->
+    <string name="recomendacion_titulo">¡Excelente elección!</string>
+    <string name="recomendacion_pregunta">¿Quieres completar tu pedido?</string>
+    <string name="recomendacion_detalle">Agrega papas y bebida por un precio adicional.</string>
+    <string name="recomendacion_boton_aceptar">Sí, claro</string>
+    <string name="recomendacion_boton_rechazar">No, gracias</string>
+
+    <!-- Pantalla de resumen -->
+    <string name="resumen_titulo">Resumen del pedido</string>
+    <string name="resumen_seccion_productos">Productos</string>
+    <string name="resumen_subtotal">Subtotal</string>
+    <string name="resumen_envio">Envío</string>
+    <string name="resumen_total">TOTAL</string>
+    <string name="resumen_seccion_entrega">🚚 Entrega</string>
+    <string name="resumen_direccion">Dirección: Por definir</string>
+    <string name="resumen_pago">Pago: Por definir</string>
+    <string name="resumen_boton_confirmar">Confirmar Pedido</string>
+
+    <!-- Pantalla de confirmación -->
+    <string name="confirmacion_titulo">¡Pedido confirmado!</string>
+    <string name="confirmacion_mensaje">Tu pedido ha sido recibido correctamente.</string>
+    <string name="confirmacion_numero_pedido">Pedido #1024</string>
+    <string name="confirmacion_entrega_estimada">⏱️ Entrega estimada: 30 - 40 minutos</string>
+    <string name="confirmacion_metodo_pago">💳 Método de pago: Por definir</string>
+    <string name="confirmacion_estado">📦 Estado: Pedido recibido</string>
+    <string name="confirmacion_boton_seguir">Seguir pedido en vivo</string>
+    <string name="confirmacion_boton_volver">Volver al inicio</string>
 
 </resources>
