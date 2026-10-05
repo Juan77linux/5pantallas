@@ -1,142 +1,204 @@
 package com.example.myapplication.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import com.example.myapplication.AzulClaroOrderBot
+import com.example.myapplication.AzulOrderBot
+import com.example.myapplication.FondoOrderBot
 import com.example.myapplication.R
-import com.example.myapplication.model.ModoTema
-import com.example.myapplication.ui.components.BotonModoTema
-import com.example.myapplication.ui.components.BotonPrimario
-import com.example.myapplication.ui.components.TarjetaBeneficio
-import com.example.myapplication.ui.theme.OrderBotTheme
+import com.example.myapplication.TextoPrincipal
+import com.example.myapplication.TextoSecundario
 
-/**
- * Pantalla 1: bienvenida y beneficios de OrderBot.
- *
- * @param onComenzar navega a la pantalla de conversación.
- * @param modoTema modo de tema activo (para el botón de cambio).
- * @param onCambiarTema alterna claro → oscuro → automático.
- */
 @Composable
 fun PantallaInicio(
-    onComenzar: () -> Unit,
-    modoTema: ModoTema,
-    onCambiarTema: () -> Unit
+    comenzarPedido: () -> Unit,
+    acercaDe: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            // Respeta las barras del sistema con enableEdgeToEdge.
-            .safeDrawingPadding()
+            .background(FondoOrderBot)
             .padding(24.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally,
+
         verticalArrangement = Arrangement.Center
     ) {
-        // Selector de tema en la esquina superior derecha.
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
-        }
 
-        // Logo
-        Box(
-            modifier = Modifier
-                .size(160.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(44.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_bot1),
-                contentDescription = stringResource(R.string.logo_descripcion),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(18.dp),
-                contentScale = ContentScale.Fit
-            )
-        }
+        Image(
+            painter = painterResource(
+                id = R.drawable.logo_bot1
+            ),
 
-        Spacer(modifier = Modifier.height(24.dp))
+            contentDescription = "Logo de OrderBot",
 
-        Text(
-            text = stringResource(R.string.app_name),
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            modifier = Modifier.size(130.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
 
         Text(
-            text = stringResource(R.string.inicio_eslogan),
+            text = "OrderBot",
+            fontSize = 34.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextoPrincipal
+        )
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Text(
+            text = "¡Pide fácil, recibe rápido!",
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
+            color = AzulOrderBot,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        TarjetaBeneficio(
-            icono = "⚡",
-            titulo = stringResource(R.string.inicio_beneficio_rapido_titulo),
-            descripcion = stringResource(R.string.inicio_beneficio_rapido_desc)
+        Spacer(
+            modifier = Modifier.height(28.dp)
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = AzulClaroOrderBot
+            )
+        ) {
 
-        TarjetaBeneficio(
-            icono = "✨",
-            titulo = stringResource(R.string.inicio_beneficio_sugerencias_titulo),
-            descripcion = stringResource(R.string.inicio_beneficio_sugerencias_desc)
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
+                Text(
+                    text = "⚡ Atención instantánea",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextoPrincipal
+                )
+
+                Spacer(
+                    modifier = Modifier.height(5.dp)
+                )
+
+                Text(
+                    text = "Disponible las 24 horas.",
+                    fontSize = 14.sp,
+                    color = TextoSecundario
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(12.dp)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = AzulClaroOrderBot
+            )
+        ) {
 
-        BotonPrimario(
-            texto = stringResource(R.string.inicio_boton_comenzar),
-            onClick = onComenzar
-        )
-    }
-}
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
 
-@Preview(showBackground = true)
-@Composable
-private fun PantallaInicioPreview() {
-    OrderBotTheme {
-        PantallaInicio(
-            onComenzar = {},
-            modoTema = ModoTema.SISTEMA,
-            onCambiarTema = {}
+                Text(
+                    text = "✨ Sugerencias personalizadas",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextoPrincipal
+                )
+
+                Spacer(
+                    modifier = Modifier.height(5.dp)
+                )
+
+                Text(
+                    text = "Encuentra opciones según tu pedido.",
+                    fontSize = 14.sp,
+                    color = TextoSecundario
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(28.dp)
         )
+
+        Button(
+            onClick = {
+                comenzarPedido()
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+
+            shape = RoundedCornerShape(16.dp),
+
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AzulOrderBot
+            )
+        ) {
+
+            Text(
+                text = "Comenzar",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        OutlinedButton(
+            onClick = {
+                acercaDe()
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+
+            shape = RoundedCornerShape(14.dp)
+        ) {
+
+            Text(
+                text = "Acerca de OrderBot",
+                color = TextoPrincipal
+            )
+        }
     }
 }
