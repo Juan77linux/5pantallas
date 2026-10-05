@@ -1,9 +1,12 @@
 package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -11,6 +14,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.model.Catalogo
+import com.example.myapplication.model.ModoTema
 import com.example.myapplication.model.ResumenPedido
+import com.example.myapplication.ui.components.BotonModoTema
 import com.example.myapplication.ui.components.BotonPrimario
 import com.example.myapplication.ui.components.FilaPrecio
 import com.example.myapplication.ui.components.OrderBotCard
@@ -33,11 +39,15 @@ import com.example.myapplication.util.aPrecio
  * muestra datos, no contiene lógica de negocio.
  *
  * @param onConfirmar navega a la pantalla de confirmación.
+ * @param modoTema modo de tema activo (para el botón de cambio).
+ * @param onCambiarTema alterna claro → oscuro → automático.
  */
 @Composable
 fun PantallaResumen(
     resumen: ResumenPedido,
-    onConfirmar: () -> Unit
+    onConfirmar: () -> Unit,
+    modoTema: ModoTema,
+    onCambiarTema: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -46,12 +56,20 @@ fun PantallaResumen(
             .safeDrawingPadding()
             .padding(20.dp)
     ) {
-        Text(
-            text = stringResource(R.string.resumen_titulo),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        // Título con el selector de tema a la derecha.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.resumen_titulo),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -133,7 +151,9 @@ private fun PantallaResumenPreview() {
             resumen = ResumenPedido(
                 productos = listOf(Catalogo.hamburguesa, Catalogo.papas, Catalogo.bebida)
             ),
-            onConfirmar = {}
+            onConfirmar = {},
+            modoTema = ModoTema.SISTEMA,
+            onCambiarTema = {}
         )
     }
 }

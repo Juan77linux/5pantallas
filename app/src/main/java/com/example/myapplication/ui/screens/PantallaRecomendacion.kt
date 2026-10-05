@@ -3,8 +3,10 @@ package com.example.myapplication.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -21,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.model.Catalogo
+import com.example.myapplication.model.ModoTema
+import com.example.myapplication.ui.components.BotonModoTema
 import com.example.myapplication.ui.components.BotonPrimario
 import com.example.myapplication.ui.components.BotonSecundario
 import com.example.myapplication.ui.components.OrderBotCard
@@ -32,11 +36,15 @@ import com.example.myapplication.util.aPrecio
  *
  * @param onAceptar el usuario acepta los complementos.
  * @param onRechazar el usuario continúa sin complementos.
+ * @param modoTema modo de tema activo (para el botón de cambio).
+ * @param onCambiarTema alterna claro → oscuro → automático.
  */
 @Composable
 fun PantallaRecomendacion(
     onAceptar: () -> Unit,
-    onRechazar: () -> Unit
+    onRechazar: () -> Unit,
+    modoTema: ModoTema,
+    onCambiarTema: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -47,6 +55,14 @@ fun PantallaRecomendacion(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Selector de tema en la esquina superior derecha.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
+        }
+
         Text(text = Catalogo.hamburguesa.emoji, fontSize = 70.sp)
 
         Spacer(modifier = Modifier.height(18.dp))
@@ -125,6 +141,11 @@ private fun ComplementoItem(
 @Composable
 private fun PantallaRecomendacionPreview() {
     OrderBotTheme {
-        PantallaRecomendacion(onAceptar = {}, onRechazar = {})
+        PantallaRecomendacion(
+            onAceptar = {},
+            onRechazar = {},
+            modoTema = ModoTema.SISTEMA,
+            onCambiarTema = {}
+        )
     }
 }

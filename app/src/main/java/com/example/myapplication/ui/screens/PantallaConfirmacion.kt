@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -23,6 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
+import com.example.myapplication.model.ModoTema
+import com.example.myapplication.ui.components.BotonModoTema
 import com.example.myapplication.ui.components.BotonPrimario
 import com.example.myapplication.ui.components.BotonSecundario
 import com.example.myapplication.ui.components.OrderBotCard
@@ -31,10 +35,19 @@ import com.example.myapplication.ui.theme.OrderBotTheme
 /**
  * Pantalla 5: confirmación del pedido realizado.
  *
+ * @param numeroPedido número generado al confirmar; llega como
+ *        argumento type-safe de la ruta de navegación.
  * @param onVolverInicio reinicia el flujo volviendo a la pantalla inicial.
+ * @param modoTema modo de tema activo (para el botón de cambio).
+ * @param onCambiarTema alterna claro → oscuro → automático.
  */
 @Composable
-fun PantallaConfirmacion(onVolverInicio: () -> Unit) {
+fun PantallaConfirmacion(
+    numeroPedido: Int,
+    onVolverInicio: () -> Unit,
+    modoTema: ModoTema,
+    onCambiarTema: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,6 +57,14 @@ fun PantallaConfirmacion(onVolverInicio: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Selector de tema en la esquina superior derecha.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
+        }
+
         // Ícono de éxito: se usa el color "tertiary" del tema
         // (verde de marca) en lugar de un valor fijo.
         Box(
@@ -87,7 +108,7 @@ fun PantallaConfirmacion(onVolverInicio: () -> Unit) {
         // Información del pedido
         OrderBotCard {
             Text(
-                text = stringResource(R.string.confirmacion_numero_pedido),
+                text = stringResource(R.string.confirmacion_numero_pedido, numeroPedido),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -131,6 +152,11 @@ fun PantallaConfirmacion(onVolverInicio: () -> Unit) {
 @Composable
 private fun PantallaConfirmacionPreview() {
     OrderBotTheme {
-        PantallaConfirmacion(onVolverInicio = {})
+        PantallaConfirmacion(
+            numeroPedido = 1024,
+            onVolverInicio = {},
+            modoTema = ModoTema.SISTEMA,
+            onCambiarTema = {}
+        )
     }
 }

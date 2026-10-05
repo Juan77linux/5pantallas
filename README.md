@@ -36,12 +36,20 @@ flowchart LR
 | **Resumen** | Se muestran los productos, subtotal, envío y total. |
 | **Confirmación** | Número de pedido, entrega estimada y estado. |
 
+## 📸 Capturas de pantalla
+
+| Inicio | Conversación | Recomendación | Resumen | Confirmación |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Inicio](docs/screenshots/pantalla1.png) | ![Conversación](docs/screenshots/pantalla2.png) | ![Recomendación](docs/screenshots/pantalla3.png) | ![Resumen](docs/screenshots/pantalla4.png) | ![Confirmación](docs/screenshots/pantalla5.png) |
+| Bienvenida en **modo oscuro** 🌙, con el logo, los beneficios y el botón *Comenzar*. | El bot saluda y muestra el catálogo: hamburguesa disponible y pizza "próximamente". | Venta cruzada: ofrece agregar papas y bebida antes de continuar. | Detalle del pedido con subtotal, envío y total calculados desde el `PedidoViewModel`. | Pedido creado con su número generado (#9916), que llega por la **ruta type-safe** de navegación. |
+
 ## ✨ Características
 
 - 🎨 UI declarativa con **Jetpack Compose** y **Material 3**.
-- 🌗 Tema claro y **oscuro** con paleta de marca propia (`OrderBotTheme`).
-- 🧭 Navegación entre pantallas con `enum` type-safe (sin números mágicos).
-- 💾 Estado que **sobrevive a rotaciones** y muerte del proceso (`rememberSaveable`).
+- 🌗 Tema claro y **oscuro** con paleta de marca propia (`OrderBotTheme`), botón para alternar ☀️/🌙/🌗 (automático) y **persistencia** de la elección con DataStore.
+- 🧭 **Navigation Compose 2.9 type-safe**: rutas `@Serializable`, sin strings ni números mágicos.
+- 🧠 **ViewModels con StateFlow** (patrón UDF): el estado del pedido y del tema sobrevive a rotaciones y se comparte entre pantallas.
+- 💾 Preferencia de tema persistida con **DataStore**.
 - 💰 Precios centralizados en un catálogo: **una sola fuente de verdad**.
 - 🧮 Lógica de negocio (subtotal/total) **separada de la UI** y con pruebas unitarias.
 - 🌎 Textos en `strings.xml`, listos para traducir; precios formateados con `NumberFormat` (es-CO).
@@ -52,27 +60,37 @@ flowchart LR
 
 | Área | Tecnología |
 |---|---|
-| Lenguaje | Kotlin 2.2.10 |
+| Lenguaje | Kotlin 2.2.10 + kotlinx-serialization |
 | UI | Jetpack Compose (BOM 2026.02.01) + Material 3 |
+| Navegación | Navigation Compose 2.9 (rutas type-safe `@Serializable`) |
+| Arquitectura | ViewModel + StateFlow (UDF) · DataStore Preferences |
 | Build | Gradle 9.5 · AGP 9.3.2 · Kotlin DSL |
 | Compatibilidad | minSdk 24 · targetSdk 37 |
-| Pruebas | JUnit 4 (pruebas unitarias locales) |
+| Pruebas | JUnit 4 (14 pruebas unitarias locales) |
 
 ## 📂 Estructura del proyecto
 
 ```
 app/src/main/java/com/example/myapplication/
-├── MainActivity.kt              # Activity + navegación del flujo (estado raíz)
+├── MainActivity.kt              # Activity: tema (TemaViewModel) + AppNavigation
 ├── navigation/
-│   └── Pantalla.kt              # Enum de pantallas (navegación type-safe)
+│   ├── Rutas.kt                 # Rutas @Serializable (type-safe)
+│   └── AppNavigation.kt         # NavHost con el grafo del flujo
+├── viewmodel/
+│   ├── PedidoViewModel.kt       # Estado del pedido compartido (StateFlow)
+│   └── TemaViewModel.kt         # Modo de tema + persistencia
+├── data/
+│   └── PreferenciasUsuario.kt   # Persistencia del modo de tema (DataStore)
 ├── model/
 │   ├── Producto.kt              # Data class Producto + Catalogo (precios únicos)
-│   └── ResumenPedido.kt         # Lógica de negocio: subtotal y total
+│   ├── ResumenPedido.kt         # Lógica de negocio: subtotal y total
+│   └── ModoTema.kt              # Enum: SISTEMA / CLARO / OSCURO + ciclo
 ├── util/
 │   └── FormatoPrecio.kt         # Int.aPrecio(): 29000 -> "$29.000" (es-CO)
 └── ui/
     ├── components/              # Componentes reutilizables
     │   ├── Botones.kt           #   BotonPrimario / BotonSecundario
+    │   ├── BotonModoTema.kt     #   Selector claro/oscuro/automático
     │   ├── OrderBotCard.kt      #   Tarjeta base con estilo unificado
     │   ├── TarjetaBeneficio.kt
     │   ├── TarjetaProducto.kt   #   Con API de "slots" para la acción

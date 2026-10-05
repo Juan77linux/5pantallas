@@ -11,6 +11,12 @@
     <!-- General -->
     <string name="logo_descripcion">Logo de OrderBot</string>
 
+    <!-- Selector de tema -->
+    <string name="tema_cambiar">Cambiar tema</string>
+    <string name="tema_modo_sistema">automático (sistema)</string>
+    <string name="tema_modo_claro">claro</string>
+    <string name="tema_modo_oscuro">oscuro</string>
+
     <!-- Pantalla de inicio -->
     <string name="inicio_eslogan">¡Pide fácil, recibe rápido!</string>
     <string name="inicio_beneficio_rapido_titulo">Atención instantánea</string>
@@ -55,7 +61,8 @@
     <!-- Pantalla de confirmación -->
     <string name="confirmacion_titulo">¡Pedido confirmado!</string>
     <string name="confirmacion_mensaje">Tu pedido ha sido recibido correctamente.</string>
-    <string name="confirmacion_numero_pedido">Pedido #1024</string>
+    <!-- %1$d se reemplaza por el número de pedido que llega en la ruta de navegación -->
+    <string name="confirmacion_numero_pedido">Pedido #%1$d</string>
     <string name="confirmacion_entrega_estimada">⏱️ Entrega estimada: 30 - 40 minutos</string>
     <string name="confirmacion_metodo_pago">💳 Método de pago: Por definir</string>
     <string name="confirmacion_estado">📦 Estado: Pedido recibido</string>

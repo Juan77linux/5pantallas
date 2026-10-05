@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -26,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
+import com.example.myapplication.model.ModoTema
+import com.example.myapplication.ui.components.BotonModoTema
 import com.example.myapplication.ui.components.BotonPrimario
 import com.example.myapplication.ui.components.TarjetaBeneficio
 import com.example.myapplication.ui.theme.OrderBotTheme
@@ -34,9 +38,15 @@ import com.example.myapplication.ui.theme.OrderBotTheme
  * Pantalla 1: bienvenida y beneficios de OrderBot.
  *
  * @param onComenzar navega a la pantalla de conversación.
+ * @param modoTema modo de tema activo (para el botón de cambio).
+ * @param onCambiarTema alterna claro → oscuro → automático.
  */
 @Composable
-fun PantallaInicio(onComenzar: () -> Unit) {
+fun PantallaInicio(
+    onComenzar: () -> Unit,
+    modoTema: ModoTema,
+    onCambiarTema: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,23 +57,30 @@ fun PantallaInicio(onComenzar: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Selector de tema en la esquina superior derecha.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
+        }
+
         // Logo
         Box(
             modifier = Modifier
-                .size(100.dp)
+                .size(160.dp)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(44.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_bot1),
                 contentDescription = stringResource(R.string.logo_descripcion),
-                // Antes: size(300.dp) desbordaba el contenedor de 100.dp.
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(12.dp),
+                    .padding(18.dp),
                 contentScale = ContentScale.Fit
             )
         }
@@ -116,6 +133,10 @@ fun PantallaInicio(onComenzar: () -> Unit) {
 @Composable
 private fun PantallaInicioPreview() {
     OrderBotTheme {
-        PantallaInicio(onComenzar = {})
+        PantallaInicio(
+            onComenzar = {},
+            modoTema = ModoTema.SISTEMA,
+            onCambiarTema = {}
+        )
     }
 }

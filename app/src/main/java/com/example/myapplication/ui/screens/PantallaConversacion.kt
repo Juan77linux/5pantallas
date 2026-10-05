@@ -1,9 +1,12 @@
 package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -12,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.model.Catalogo
+import com.example.myapplication.model.ModoTema
+import com.example.myapplication.ui.components.BotonModoTema
 import com.example.myapplication.ui.components.OrderBotCard
 import com.example.myapplication.ui.components.TarjetaProducto
 import com.example.myapplication.ui.theme.OrderBotTheme
@@ -29,9 +35,15 @@ import com.example.myapplication.util.aPrecio
  * Pantalla 2: el bot saluda y muestra el catálogo.
  *
  * @param onSeleccionarProducto navega a la recomendación de complementos.
+ * @param modoTema modo de tema activo (para el botón de cambio).
+ * @param onCambiarTema alterna claro → oscuro → automático.
  */
 @Composable
-fun PantallaConversacion(onSeleccionarProducto: () -> Unit) {
+fun PantallaConversacion(
+    onSeleccionarProducto: () -> Unit,
+    modoTema: ModoTema,
+    onCambiarTema: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,13 +51,21 @@ fun PantallaConversacion(onSeleccionarProducto: () -> Unit) {
             .safeDrawingPadding()
             .padding(20.dp)
     ) {
-        // Encabezado
-        Text(
-            text = stringResource(R.string.conversacion_titulo),
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        // Encabezado con el selector de tema a la derecha.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.conversacion_titulo),
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            BotonModoTema(modo = modoTema, onClick = onCambiarTema)
+        }
+
         Text(
             text = stringResource(R.string.conversacion_subtitulo),
             fontSize = 14.sp,
@@ -107,6 +127,10 @@ fun PantallaConversacion(onSeleccionarProducto: () -> Unit) {
 @Composable
 private fun PantallaConversacionPreview() {
     OrderBotTheme {
-        PantallaConversacion(onSeleccionarProducto = {})
+        PantallaConversacion(
+            onSeleccionarProducto = {},
+            modoTema = ModoTema.SISTEMA,
+            onCambiarTema = {}
+        )
     }
 }

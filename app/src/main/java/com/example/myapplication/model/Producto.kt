@@ -11,10 +11,12 @@ import com.example.myapplication.R
  * se maneja como entero en pesos (nunca como texto).
  */
 data class Producto(
-    @StringRes val nombreRes: Int,
+    // @param: aplica la anotación solo al parámetro del constructor
+    // (silencia el warning KT-73255 de Kotlin sobre el target).
+    @param:StringRes val nombreRes: Int,
     val emoji: String,
     val precio: Int,
-    @StringRes val descripcionRes: Int? = null
+    @param:StringRes val descripcionRes: Int? = null
 )
 
 /**

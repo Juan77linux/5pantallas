@@ -1,24 +1,24 @@
 package com.example.myapplication
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.model.Catalogo
-import com.example.myapplication.model.ResumenPedido
-import com.example.myapplication.navigation.Pantalla
-import com.example.myapplication.ui.screens.PantallaConfirmacion
-import com.example.myapplication.ui.screens.PantallaConversacion
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.model.ModoTema
+import com.example.myapplication.navigation.AppNavigation
 import com.example.myapplication.ui.screens.PantallaInicio
-import com.example.myapplication.ui.screens.PantallaRecomendacion
-import com.example.myapplication.ui.screens.PantallaResumen
 import com.example.myapplication.ui.theme.OrderBotTheme
+import com.example.myapplication.viewmodel.TemaViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -26,77 +26,64 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            OrderBotTheme {
-                OrderBotApp()
-            }
+            OrderBotApp()
         }
     }
 }
 
 /**
- * Raíz de la app: guarda el estado del flujo y decide qué
- * pantalla mostrar. No contiene UI propia; cada pantalla vive
- * en su archivo dentro de ui/screens.
+ * Raíz de la app: decide el tema a partir del TemaViewModel
+ * y delega la navegación al NavHost (AppNavigation).
+ *
+ * Ya no guarda el estado del pedido ni la pantalla actual:
+ * eso ahora es responsabilidad del PedidoViewModel y del NavController.
  */
 @Composable
-fun OrderBotApp() {
-    // rememberSaveable conserva el estado ante rotaciones y
-    // muerte del proceso (con remember se perdía).
-    var pantallaActual by rememberSaveable { mutableStateOf(Pantalla.INICIO) }
-    var incluyeComplementos by rememberSaveable { mutableStateOf(false) }
+fun OrderBotApp(
+    temaViewModel: TemaViewModel = viewModel()
+) {
+    // Estado observado del ViewModel: sobrevive a rotaciones.
+    val modoTema by temaViewModel.modoTema.collectAsStateWithLifecycle()
 
-    // when exhaustivo sobre el enum: si se agrega una pantalla,
-    // el compilador obliga a manejarla aquí.
-    when (pantallaActual) {
-        Pantalla.INICIO -> PantallaInicio(
-            onComenzar = { pantallaActual = Pantalla.CONVERSACION }
-        )
+    // Detección de la preferencia del sistema; solo aplica en modo SISTEMA.
+    val sistemaOscuro = isSystemInDarkTheme()
+    val temaOscuro = when (modoTema) {
+        ModoTema.SISTEMA -> sistemaOscuro
+        ModoTema.CLARO -> false
+        ModoTema.OSCURO -> true
+    }
 
-        Pantalla.CONVERSACION -> PantallaConversacion(
-            onSeleccionarProducto = { pantallaActual = Pantalla.RECOMENDACION }
-        )
-
-        Pantalla.RECOMENDACION -> PantallaRecomendacion(
-            onAceptar = {
-                incluyeComplementos = true
-                pantallaActual = Pantalla.RESUMEN
-            },
-            onRechazar = {
-                incluyeComplementos = false
-                pantallaActual = Pantalla.RESUMEN
+    // Pinta los íconos de las barras del sistema (hora, batería...)
+    // en claro u oscuro según el tema activo para que sean legibles.
+    val vista = LocalView.current
+    if (!vista.isInEditMode) {
+        SideEffect {
+            val ventana = (vista.context as Activity).window
+            WindowCompat.getInsetsController(ventana, vista).apply {
+                isAppearanceLightStatusBars = !temaOscuro
+                isAppearanceLightNavigationBars = !temaOscuro
             }
-        )
+        }
+    }
 
-        Pantalla.RESUMEN -> PantallaResumen(
-            resumen = construirResumen(incluyeComplementos),
-            onConfirmar = { pantallaActual = Pantalla.CONFIRMACION }
-        )
-
-        Pantalla.CONFIRMACION -> PantallaConfirmacion(
-            onVolverInicio = { pantallaActual = Pantalla.INICIO }
+    OrderBotTheme(darkTheme = temaOscuro) {
+        AppNavigation(
+            modoTema = modoTema,
+            onCambiarTema = temaViewModel::cambiarModoTema
         )
     }
 }
-
-/**
- * Arma el pedido con los productos elegidos.
- * Al usar buildList, agregar nuevos productos al flujo
- * es una línea y no requiere cambiar la pantalla de resumen.
- */
-private fun construirResumen(incluyeComplementos: Boolean) = ResumenPedido(
-    productos = buildList {
-        add(Catalogo.hamburguesa)
-        if (incluyeComplementos) {
-            add(Catalogo.papas)
-            add(Catalogo.bebida)
-        }
-    }
-)
 
 @Preview(showBackground = true)
 @Composable
 private fun OrderBotPreview() {
+    // Se previsualiza una sola pantalla: AppNavigation necesita un
+    // NavController real y ViewModels, no disponibles en previews.
     OrderBotTheme {
-        OrderBotApp()
+        PantallaInicio(
+            onComenzar = {},
+            modoTema = ModoTema.SISTEMA,
+            onCambiarTema = {}
+        )
     }
 }
