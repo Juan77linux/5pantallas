@@ -5,6 +5,9 @@ package com.example.myapplication
 // ============================================================
 
 import android.os.Bundle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 // Activity principal de Android.
 import androidx.activity.ComponentActivity
@@ -37,10 +40,12 @@ import androidx.compose.material3.Text
 
 // Estado de Compose.
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+
+// ViewModel.
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // Herramientas de interfaz.
 import androidx.compose.ui.Alignment
@@ -51,32 +56,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 // Permite mostrar imágenes en Compose.
 import androidx.compose.foundation.Image
 
 // Permite cargar imágenes desde res/drawable.
 import androidx.compose.ui.res.painterResource
 
+
 // ============================================================
 // COLORES DE ORDERBOT
 // ============================================================
 
-// Color principal de la aplicación.
 val AzulOrderBot = Color(0xFF2563EB)
-
-// Color utilizado para destacar información.
 val AzulClaroOrderBot = Color(0xFFEFF6FF)
-
-// Fondo general de la aplicación.
 val FondoOrderBot = Color(0xFFF8FAFC)
-
-// Color del texto principal.
 val TextoPrincipal = Color(0xFF172033)
-
-// Color del texto secundario.
 val TextoSecundario = Color(0xFF64748B)
-
-// Color utilizado para confirmar acciones.
 val VerdeOrderBot = Color(0xFF16A34A)
 
 
@@ -89,10 +85,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Permite utilizar toda la pantalla.
         enableEdgeToEdge()
 
-        // Iniciamos nuestra aplicación Compose.
         setContent {
             OrderBotApp()
         }
@@ -107,109 +101,78 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OrderBotApp() {
 
-    // Controla la pantalla que estamos mostrando.
-    //
-    // 1 = Inicio
-    // 2 = Conversación
-    // 3 = Recomendación
-    // 4 = Resumen
-    // 5 = Confirmación
-    var pantallaActual by remember {
-        mutableStateOf(1)
-    }
+    val navController = rememberNavController()
 
-    // Indica si el usuario agregó papas y bebida.
-    var agregoComplementos by remember {
-        mutableStateOf(false)
-    }
+    val viewModel: OrderBotViewModel = viewModel()
 
+    val agregoComplementos by viewModel.agregoComplementos.collectAsState()
 
-    // ========================================================
-    // CONTROL DE PANTALLAS
-    // ========================================================
+    // Estado obtenido desde el servicio online.
+    val estadoOnline by viewModel.estadoOnline.collectAsState()
 
-    when (pantallaActual) {
+    NavHost(
+        navController = navController,
+        startDestination = "inicio"
+    ) {
 
-        // ----------------------------------------------------
-        // PANTALLA 1
-        // ----------------------------------------------------
-
-        1 -> {
+        composable("inicio") {
 
             PantallaInicio(
                 comenzarPedido = {
-                    pantallaActual = 2
-                }
-            )
-        }
-
-
-        // ----------------------------------------------------
-        // PANTALLA 2
-        // ----------------------------------------------------
-
-        2 -> {
-
-            PantallaConversacion(
-                seleccionarHamburguesa = {
-                    pantallaActual = 3
-                }
-            )
-        }
-
-
-        // ----------------------------------------------------
-        // PANTALLA 3
-        // ----------------------------------------------------
-
-        3 -> {
-
-            PantallaRecomendacion(
-
-                // El usuario acepta papas y bebida.
-                aceptar = {
-
-                    agregoComplementos = true
-                    pantallaActual = 4
+                    navController.navigate("conversacion")
                 },
 
-                // El usuario no quiere los complementos.
+                acercaDe = {
+                    navController.navigate("acerca")
+                }
+            )
+        }
+
+        composable("conversacion") {
+            PantallaConversacion {
+                navController.navigate("recomendacion")
+            }
+        }
+
+        composable("recomendacion") {
+            PantallaRecomendacion(
+                aceptar = {
+                    viewModel.seleccionarComplementos(true)
+                    navController.navigate("resumen")
+                },
                 rechazar = {
-
-                    agregoComplementos = false
-                    pantallaActual = 4
+                    viewModel.seleccionarComplementos(false)
+                    navController.navigate("resumen")
                 }
             )
         }
 
-
-        // ----------------------------------------------------
-        // PANTALLA 4
-        // ----------------------------------------------------
-
-        4 -> {
-
+        composable("resumen") {
             PantallaResumen(
-
                 tieneComplementos = agregoComplementos,
-
                 confirmar = {
-                    pantallaActual = 5
+                    viewModel.guardarPedido()
+                    navController.navigate("confirmacion")
                 }
             )
         }
 
+        composable("confirmacion") {
 
-        // ----------------------------------------------------
-        // PANTALLA 5
-        // ----------------------------------------------------
-
-        5 -> {
+            // Consultamos el servicio online
+            // cuando entramos a la pantalla.
+            LaunchedEffect(Unit) {
+                viewModel.consultarServicioOnline()
+            }
 
             PantallaConfirmacion(
-
+                estadoOnline = estadoOnline,
                 volverInicio = {
-                    pantallaActual = 1
+                    navController.navigate("inicio") {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
@@ -223,7 +186,8 @@ fun OrderBotApp() {
 
 @Composable
 fun PantallaInicio(
-    comenzarPedido: () -> Unit
+    comenzarPedido: () -> Unit,
+    acercaDe: () -> Unit
 ) {
 
     Column(
@@ -237,10 +201,6 @@ fun PantallaInicio(
         verticalArrangement = Arrangement.Center
     ) {
 
-        // ----------------------------------------------------
-        // LOGO
-        // ----------------------------------------------------
-
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -252,14 +212,11 @@ fun PantallaInicio(
             contentAlignment = Alignment.Center
         ) {
 
-            // Mostramos nuestro logo de OrderBot.
             Image(
                 painter = painterResource(
                     id = R.drawable.logo_bot1
                 ),
                 contentDescription = "Logo de OrderBot",
-
-                // Ajustamos el tamaño del logo.
                 modifier = Modifier.size(300.dp)
             )
         }
@@ -267,11 +224,6 @@ fun PantallaInicio(
         Spacer(
             modifier = Modifier.height(24.dp)
         )
-
-
-        // ----------------------------------------------------
-        // NOMBRE
-        // ----------------------------------------------------
 
         Text(
             text = "OrderBot",
@@ -284,11 +236,6 @@ fun PantallaInicio(
             modifier = Modifier.height(8.dp)
         )
 
-
-        // ----------------------------------------------------
-        // FRASE PRINCIPAL
-        // ----------------------------------------------------
-
         Text(
             text = "¡Pide fácil, recibe rápido!",
             fontSize = 20.sp,
@@ -300,11 +247,6 @@ fun PantallaInicio(
         Spacer(
             modifier = Modifier.height(32.dp)
         )
-
-
-        // ----------------------------------------------------
-        // BENEFICIOS
-        // ----------------------------------------------------
 
         TarjetaBeneficio(
             icono = "⚡",
@@ -326,11 +268,7 @@ fun PantallaInicio(
             modifier = Modifier.height(32.dp)
         )
 
-
-        // ----------------------------------------------------
-        // BOTÓN COMENZAR
-        // ----------------------------------------------------
-
+        // BOTÓN PARA COMENZAR EL PEDIDO
         Button(
             onClick = {
                 comenzarPedido()
@@ -351,6 +289,28 @@ fun PantallaInicio(
                 text = "Comenzar",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        // BOTÓN PARA DESCRIPCIÓN Y CRÉDITOS
+        OutlinedButton(
+            onClick = {
+                acercaDe()
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+
+            shape = RoundedCornerShape(14.dp)
+        ) {
+
+            Text(
+                text = "Acerca de OrderBot"
             )
         }
     }
@@ -435,10 +395,6 @@ fun PantallaConversacion(
             .padding(20.dp)
     ) {
 
-        // ----------------------------------------------------
-        // ENCABEZADO
-        // ----------------------------------------------------
-
         Text(
             text = "OrderBot 💬",
             fontSize = 26.sp,
@@ -455,11 +411,6 @@ fun PantallaConversacion(
         Spacer(
             modifier = Modifier.height(24.dp)
         )
-
-
-        // ----------------------------------------------------
-        // MENSAJE DEL BOT
-        // ----------------------------------------------------
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -498,11 +449,6 @@ fun PantallaConversacion(
             modifier = Modifier.height(24.dp)
         )
 
-
-        // ----------------------------------------------------
-        // PRODUCTO 1
-        // ----------------------------------------------------
-
         TarjetaProducto(
             emoji = "🍔",
             nombre = "Hamburguesa",
@@ -516,11 +462,6 @@ fun PantallaConversacion(
         Spacer(
             modifier = Modifier.height(14.dp)
         )
-
-
-        // ----------------------------------------------------
-        // PRODUCTO 2
-        // ----------------------------------------------------
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -726,11 +667,6 @@ fun PantallaRecomendacion(
             modifier = Modifier.height(28.dp)
         )
 
-
-        // ----------------------------------------------------
-        // COMPLEMENTOS
-        // ----------------------------------------------------
-
         Card(
             modifier = Modifier.fillMaxWidth(),
 
@@ -777,11 +713,6 @@ fun PantallaRecomendacion(
             modifier = Modifier.height(24.dp)
         )
 
-
-        // ----------------------------------------------------
-        // BOTÓN ACEPTAR
-        // ----------------------------------------------------
-
         Button(
             onClick = {
                 aceptar()
@@ -806,11 +737,6 @@ fun PantallaRecomendacion(
         Spacer(
             modifier = Modifier.height(10.dp)
         )
-
-
-        // ----------------------------------------------------
-        // BOTÓN RECHAZAR
-        // ----------------------------------------------------
 
         OutlinedButton(
             onClick = {
@@ -842,21 +768,17 @@ fun PantallaResumen(
     confirmar: () -> Unit
 ) {
 
-    // Precios del ejemplo.
     val precioHamburguesa = 20000
     val precioPapas = 5000
     val precioBebida = 4000
     val precioEnvio = 5000
 
-    // Calculamos el subtotal dependiendo
-    // de lo que seleccionó el usuario.
     val subtotal = if (tieneComplementos) {
         precioHamburguesa + precioPapas + precioBebida
     } else {
         precioHamburguesa
     }
 
-    // Sumamos el costo de envío.
     val total = subtotal + precioEnvio
 
     Column(
@@ -876,11 +798,6 @@ fun PantallaResumen(
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-
-
-        // ----------------------------------------------------
-        // PRODUCTOS
-        // ----------------------------------------------------
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -966,11 +883,6 @@ fun PantallaResumen(
             modifier = Modifier.height(16.dp)
         )
 
-
-        // ----------------------------------------------------
-        // ENTREGA
-        // ----------------------------------------------------
-
         Card(
             modifier = Modifier.fillMaxWidth(),
 
@@ -1010,11 +922,6 @@ fun PantallaResumen(
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-
-
-        // ----------------------------------------------------
-        // CONFIRMAR
-        // ----------------------------------------------------
 
         Button(
             onClick = {
@@ -1097,6 +1004,7 @@ fun FilaPrecio(
 
 @Composable
 fun PantallaConfirmacion(
+    estadoOnline: String,
     volverInicio: () -> Unit
 ) {
 
@@ -1138,7 +1046,6 @@ fun PantallaConfirmacion(
             modifier = Modifier.height(24.dp)
         )
 
-
         // ----------------------------------------------------
         // MENSAJE
         // ----------------------------------------------------
@@ -1165,7 +1072,6 @@ fun PantallaConfirmacion(
         Spacer(
             modifier = Modifier.height(24.dp)
         )
-
 
         // ----------------------------------------------------
         // INFORMACIÓN DEL PEDIDO
@@ -1217,13 +1123,30 @@ fun PantallaConfirmacion(
                     text = "📦 Estado: Pedido recibido",
                     color = TextoSecundario
                 )
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+                // ------------------------------------------------
+                // ESTADO DEL SERVICIO ONLINE
+                // ------------------------------------------------
+
+                Text(
+                    text = "🌐 Servicio: $estadoOnline",
+                    fontWeight = FontWeight.Bold,
+                    color = if (estadoOnline == "Sin conexión") {
+                        TextoSecundario
+                    } else {
+                        VerdeOrderBot
+                    }
+                )
             }
         }
 
         Spacer(
             modifier = Modifier.height(24.dp)
         )
-
 
         // ----------------------------------------------------
         // SEGUIMIENTO
@@ -1250,7 +1173,6 @@ fun PantallaConfirmacion(
         Spacer(
             modifier = Modifier.height(10.dp)
         )
-
 
         // ----------------------------------------------------
         // VOLVER AL INICIO
@@ -1280,15 +1202,6 @@ fun PantallaConfirmacion(
 // FUNCIÓN PARA FORMATEAR PRECIOS
 // ============================================================
 
-// Esta función convierte un número como:
-//
-// 29000
-//
-// en:
-//
-// 29.000
-//
-// para mostrarlo de una forma más cómoda.
 fun Int.formatear(): String {
 
     return this
@@ -1304,11 +1217,203 @@ fun Int.formatear(): String {
 // VISTA PREVIA
 // ============================================================
 
+// ============================================================
+// PANTALLA 6 - DESCRIPCIÓN Y CRÉDITOS
+// ============================================================
+
+@Composable
+fun PantallaAcercaDe(
+    volverInicio: () -> Unit
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(FondoOrderBot)
+            .padding(24.dp),
+
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Spacer(
+            modifier = Modifier.height(30.dp)
+        )
+
+        Text(
+            text = "Acerca de OrderBot",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextoPrincipal,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
+        ) {
+
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+
+                Text(
+                    text = "Descripción",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AzulOrderBot
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+                    text = "OrderBot es una aplicación móvil " +
+                            "diseñada para facilitar la selección " +
+                            "y confirmación de pedidos mediante " +
+                            "una experiencia sencilla e intuitiva.",
+
+                    fontSize = 15.sp,
+                    color = TextoSecundario
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
+        ) {
+
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+
+                Text(
+                    text = "Tecnologías",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AzulOrderBot
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+                    text = "• Jetpack Compose\n" +
+                            "• ViewModel\n" +
+                            "• Navigation Component\n" +
+                            "• Room Database\n" +
+                            "• Retrofit\n" +
+                            "• Servicio online",
+
+                    fontSize = 15.sp,
+                    color = TextoPrincipal
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
+        ) {
+
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+
+                Text(
+                    text = "Créditos",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AzulOrderBot
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+                    text = "Juan Ruales",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextoPrincipal
+                )
+
+                Spacer(
+                    modifier = Modifier.height(6.dp)
+                )
+
+                Text(
+                    text = "Juan Perafan",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextoPrincipal
+                )
+
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+
+                Text(
+                    text = "Tecnología en Telemática\nUniversidad del Cauca",
+                    fontSize = 14.sp,
+                    color = TextoSecundario
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
+
+        Button(
+            onClick = {
+                volverInicio()
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+
+            shape = RoundedCornerShape(14.dp),
+
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AzulOrderBot
+            )
+        ) {
+
+            Text(
+                text = "Volver al inicio"
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun OrderBotPreview() {
 
-    // Mostramos la aplicación completa
-    // en la vista previa de Android Studio.
     OrderBotApp()
 }
